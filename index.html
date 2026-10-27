@@ -380,4 +380,39 @@ function renderSource(){let q=document.getElementById('search').value.toLowerCas
     }
   }catch(e){console.warn('Extended TRA feed unavailable; original dashboard preserved',e)}
 })();
+</script><script>
+/* Reconcile expandable Daily Activity & Leasing with the live aggregate feed. */
+(async function traReconcileDailyDetail(){
+ try{
+  const res=await fetch('./TRA_Live_Data.json?detail='+Date.now(),{cache:'no-store'});
+  if(!res.ok)return;const d=await res.json();
+  const detail=[...document.querySelectorAll('#dailyDetails .detail')].find(el=>el.querySelector('button')?.textContent.includes('Daily Activity & Leasing'));
+  if(!detail)return;
+  const tables=detail.querySelectorAll('table');
+  const val=k=>Object.prototype.hasOwnProperty.call(d,k)?String(d[k]):null;
+  const updateRow=(table,label,keys)=>{if(!table)return;const tr=[...table.querySelectorAll('tbody tr')].find(r=>r.cells[0]?.textContent.trim().toLowerCase()===label.toLowerCase());if(!tr)return;keys.forEach((k,i)=>{const v=val(k);if(v!==null&&tr.cells[i+1])tr.cells[i+1].textContent=v})};
+  const first=tables[0];
+  if(first){
+    const th=first.querySelectorAll('thead th');
+    if(th[1])th[1].textContent='Today · '+(val('Daily Report Date')||val('Report Date')||'Latest');
+    if(th[2])th[2].textContent='Week · '+(val('Weekly Report Period')||'Current');
+    if(th[3])th[3].textContent=val('Monthly Report Period')||'Current month';
+    [['First Contact','First Contacts'],['New Tours','New Tours'],['Applications','Applications'],['Cancels','Cancellations'],['Declines','Declines'],['Net Applications','Net Applications']].forEach(([label,key])=>updateRow(first,label,['Today '+key,'Week '+key,'Month '+key]));
+  }
+  const leasing=tables[1];if(leasing){
+    const th=leasing.querySelector('thead th:nth-child(2)');if(th)th.textContent=val('Daily Report Date')||val('Report Date')||'Latest';
+    updateRow(leasing,'Total Leases Executed',['Market Units Signed']);
+    updateRow(leasing,'LEASED %',['Market Units Leased Rate']);
+  }
+  const activity=tables[2];if(activity){
+    const th=activity.querySelectorAll('thead th');
+    if(th[1])th[1].textContent='Today · '+(val('Daily Report Date')||'Latest');
+    if(th[2])th[2].textContent='Week · '+(val('Weekly Report Period')||'Current');
+    if(th[3])th[3].textContent=val('Monthly Report Period')||'Current month';
+    for(const key of ['Applications','Declines'])updateRow(activity,key,['Today '+key,'Week '+key,'Month '+key]);
+  }
+  const caption=document.createElement('p');caption.style.cssText='color:#6885a5;font-size:11px;margin:0 0 12px';caption.textContent='Activity counts and dates are live from Excel. Other detail tables remain saved workbook snapshots until separately connected.';
+  detail.querySelector('.tablewrap')?.prepend(caption);
+ }catch(err){console.warn('Daily detail live reconciliation unavailable',err)}
+})();
 </script></body></html>

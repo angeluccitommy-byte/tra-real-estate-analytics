@@ -423,4 +423,54 @@ function renderSource(){let q=document.getElementById('search').value.toLowerCas
   detail.querySelector('.tablewrap')?.prepend(caption);
  }catch(err){console.warn('Daily detail live reconciliation unavailable',err)}
 })();
-</script></body></html>
+</script>
+<script id="tra-live-weekly-monthly">
+/* Refresh only metrics present in the published Excel feed; preserve historical snapshots. */
+(async function(){
+ try{
+  const response=await fetch('TRA_Live_Data.json?updated='+Date.now(),{cache:'no-store'});
+  if(!response.ok)throw Error('Feed unavailable');
+  const d=await response.json();
+  const get=k=>Object.prototype.hasOwnProperty.call(d,k)&&d[k]!==''?String(d[k]):null;
+  const num=k=>{const v=get(k);return v===null?null:Number(v)};
+  const set=(el,v)=>{if(el&&v!==null&&v!==undefined)el.textContent=v};
+  const row=(table,label,values)=>{if(!table)return;const tr=[...table.querySelectorAll('tbody tr')].find(tr=>tr.cells[0]?.textContent.trim().toLowerCase()===label.toLowerCase());if(!tr)return;values.forEach((v,i)=>set(tr.cells[i+1],v))};
+  const section=(root,title)=>[...root.querySelectorAll('.tra-report-section')].find(el=>el.querySelector('h2')?.textContent.trim().toLowerCase()===title.toLowerCase());
+  const kpis=(root,items)=>root.querySelectorAll('.kpi').forEach(k=>{const label=k.querySelector('label')?.textContent.trim().toLowerCase();const key=items[label];if(key)set(k.querySelector('strong'),get(key))});
+  const weekly=document.getElementById('weekly'),monthly=document.getElementById('monthly');
+  if(weekly){
+   kpis(weekly,{'new tours':'Weekly New Visits','return visits':'Weekly Return Visits','new applications':'Weekly New Applications','approved applications':'Weekly Approved Applications','signed leases':'Weekly Signed Leases','cancellations':'Weekly Cancellations','net applications':'Weekly Net Applications','applications received':'Weekly New Applications','pending':'Weekly Pending Applications','approved':'Weekly Approved Applications','signed':'Weekly Signed Leases','cancelled':'Weekly Cancellations'});
+   set(weekly.querySelector('.headline .chip'),get('Weekly Report Period'));
+   const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+   const visit=days.map(day=>get('Weekly '+day+' New Visits'));
+   const returns=days.map(day=>get('Weekly '+day+' Return Visits'));
+   const tours=days.map(day=>get('Weekly '+day+' Tours'));
+   const traffic=section(weekly,'Traffic | New and returning visitors')?.querySelector('table');
+   row(traffic,'Total New Visits',[...visit,get('Weekly New Visits')]);
+   row(traffic,'Total Return Visits',[...returns,get('Weekly Return Visits')]);
+   const types=section(weekly,'Tours by apartment type')?.querySelector('table');
+   for(const [label,key] of [['Studio','Weekly Studio Tours'],['1BR','Weekly 1BR Tours'],['2BR','Weekly 2BR Tours'],['3BR','Weekly 3BR Tours']]){
+     const tr=[...types?.querySelectorAll('tbody tr')||[]].find(tr=>tr.cells[0]?.textContent.trim()===label);
+     if(tr)set(tr.cells[tr.cells.length-1],get(key));
+   }
+   if(types){const tr=[...types.querySelectorAll('tbody tr')].find(tr=>/grand total/i.test(tr.cells[0]?.textContent||''));if(tr)set(tr.cells[tr.cells.length-1],get('Weekly Total Tours'))}
+   const sources=section(weekly,'Traffic sources')?.querySelector('table');
+   for(const [label,key] of [['StreetEasy','Weekly StreetEasy Leads'],['Google','Weekly Google Leads'],['Apt.com','Weekly Apt.com Leads'],['Web','Weekly Website Leads'],['Broker','Weekly Broker Leads'],['Zillow','Weekly Zillow Leads'],['Trulia','Weekly Trulia Leads'],['Grand Total','Weekly Total Leads']]){
+     const tr=[...sources?.querySelectorAll('tbody tr')||[]].find(tr=>tr.cells[0]?.textContent.trim().toLowerCase()===label.toLowerCase());
+     if(tr)set(tr.cells[tr.cells.length-1],get(key));
+   }
+   const chart=weekly.querySelector('.tra-new-chart');
+   if(chart){const bars=chart.querySelectorAll('.tra-new-bar-row');const max=Math.max(1,...visit.map(v=>Number(v)||0));bars.forEach((bar,i)=>{if(i>=7)return;set(bar.querySelector('strong'),visit[i]);const fill=bar.querySelector('.tra-new-bar-fill');if(fill&&visit[i]!==null)fill.style.width=(100*(Number(visit[i])||0)/max)+'%'})}
+   const typeChart=weekly.querySelectorAll('.tra-new-chart')[1];
+   if(typeChart){const vals=['Weekly Studio Tours','Weekly 1BR Tours','Weekly 2BR Tours','Weekly 3BR Tours'].map(num),max=Math.max(1,...vals.map(v=>v||0));typeChart.querySelectorAll('.tra-new-bar-row').forEach((bar,i)=>{set(bar.querySelector('strong'),vals[i]);const fill=bar.querySelector('.tra-new-bar-fill');if(fill&&vals[i]!==null)fill.style.width=100*vals[i]/max+'%'})}
+   const source=weekly.querySelector('.tra-weekly-source');if(source)source.textContent='Live weekly totals from published Excel data. Detailed historical and agent breakdowns remain workbook snapshots.';
+  }
+  if(monthly){
+   kpis(monthly,{'new visits':'Monthly New Visits','return visits':'Month Return Visits','new applications':'Month Applications','cancellations':'Month Cancellations','net applications':'Month Net Applications','applications received':'Month Applications','cancelled':'Month Cancellations'});
+   set(monthly.querySelector('.headline .chip'),get('Monthly Report Period'));
+   const source=monthly.querySelector('.tra-weekly-source');if(source)source.textContent='Live monthly summary metrics from published Excel data. Weekly breakdowns, source mix, agent details and other totals remain workbook snapshots.';
+  }
+ }catch(err){console.warn('Weekly/monthly live feed unavailable',err)}
+})();
+</script>
+</body></html>

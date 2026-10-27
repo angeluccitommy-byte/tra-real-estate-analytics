@@ -473,4 +473,32 @@ function renderSource(){let q=document.getElementById('search').value.toLowerCas
  }catch(err){console.warn('Weekly/monthly live feed unavailable',err)}
 })();
 </script>
+
+<script id="tra-weekly-agent-live">
+(async function(){
+ try{
+  const res=await fetch('TRA_Live_Data.json?agent='+Date.now(),{cache:'no-store'});
+  if(!res.ok)return;
+  const data=await res.json();
+  const get=k=>Object.prototype.hasOwnProperty.call(data,k)&&data[k]!==''?String(data[k]):null;
+  const weekly=document.getElementById('weekly');if(!weekly)return;
+  const sections=[...weekly.querySelectorAll('.tra-report-section')];
+  const table=sections.find(e=>e.querySelector('h2')?.textContent.trim()==='Agent traffic')?.querySelector('table');
+  if(table){
+   for(const [label,key] of [['Tommy','Weekly Tommy Tours'],['Chris','Weekly Chris Tours'],['Brooke','Weekly Brooke Tours'],['Grand Total','Weekly Total Agent Tours']]){
+    const tr=[...table.querySelectorAll('tbody tr')].find(tr=>tr.cells[0]?.textContent.trim()===label);
+    const value=get(key);
+    if(tr&&value!==null)tr.cells[tr.cells.length-1].textContent=value;
+   }
+  }
+  const types=sections.find(e=>e.querySelector('h2')?.textContent.trim()==='Tours by apartment type')?.querySelector('table');
+  if(types){
+   const total=get('Weekly Total Tours');
+   for(const tr of types.querySelectorAll('tbody tr')){
+    if(/^(total|grand total)$/i.test(tr.cells[0]?.textContent.trim()||'')&&total!==null)tr.cells[tr.cells.length-1].textContent=total;
+   }
+  }
+ }catch(err){console.warn('Weekly agent totals unavailable',err)}
+})();
+</script>
 </body></html>

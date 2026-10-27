@@ -501,4 +501,65 @@ function renderSource(){let q=document.getElementById('search').value.toLowerCas
  }catch(err){console.warn('Weekly agent totals unavailable',err)}
 })();
 </script>
+
+<script id="tra-monthly-detail-live">
+(async function(){
+ try{
+  const res=await fetch('TRA_Live_Data.json?monthly='+Date.now(),{cache:'no-store'});if(!res.ok)return;
+  const d=await res.json(),root=document.getElementById('monthly');if(!root)return;
+  const get=k=>Object.prototype.hasOwnProperty.call(d,k)&&d[k]!==''?String(d[k]):null;
+  const put=(cell,value)=>{if(cell&&value!==null&&value!==undefined)cell.textContent=value};
+  const fmt=k=>{const v=get(k);return v===null?null:(Number(v)*100).toFixed(1)+'%'};
+  const sections=[...root.querySelectorAll('.tra-report-section')];
+  const table=title=>sections.find(e=>e.querySelector('h2')?.textContent.trim().toLowerCase()===title.toLowerCase())?.querySelector('table');
+  const match=(t,label)=>[...t?.querySelectorAll('tbody tr')||[]].find(tr=>tr.cells[0]?.textContent.trim().toLowerCase()===label.toLowerCase());
+  const setRow=(t,label,values)=>{const tr=match(t,label);if(!tr)return;values.forEach((v,i)=>put(tr.cells[i+1],v))};
+  const weekly=(prefix)=>Array.from({length:5},(_,i)=>get(prefix+' Week '+(i+1)+' Tours'));
+  const traffic=table('Traffic | New and returning visitors');
+  setRow(traffic,'Total New Visits',[...Array.from({length:5},(_,i)=>get('Monthly Week '+(i+1)+' New Visits')),null,null,get('Monthly New Visits Table Total')]);
+  setRow(traffic,'Total Return Visits',[...Array.from({length:5},(_,i)=>get('Monthly Week '+(i+1)+' Return Visits')),null,null,get('Monthly Return Visits Table Total')]);
+  const agent=table('Agent traffic');
+  for(const [label,prefix] of [['Tommy','Monthly Tommy'],['Chris','Monthly Chris'],['Brooke','Monthly Brooke'],['Grand Total','Monthly Total']]){
+   setRow(agent,label,[...weekly(prefix),null,null,get(prefix+' Tours')]);
+  }
+  const sources=table('Traffic sources');
+  for(const [label,prefix] of [['StreetEasy','Monthly StreetEasy'],['Google','Monthly Google'],['Apt.com','Monthly Apt.com'],['Web','Monthly Website'],['Broker','Monthly Broker'],['Zillow','Monthly Zillow'],['Trulia','Monthly Trulia'],['Grand Total','Monthly Total']]){
+   setRow(sources,label,[...Array.from({length:5},(_,i)=>get(prefix+' Week '+(i+1)+' Leads')),null,null,get(prefix+' Leads')]);
+  }
+  const performance=table('Agent performance | Month to date');
+  for(const [label,prefix] of [['Tommy','Monthly Tommy'],['Chris','Monthly Chris'],['Brooke','Monthly Brooke'],['Grand Total','Monthly Total']]){
+   const gross=get(prefix+' Gross Applications'),cancel=get(prefix+' Cancellations');
+   const loss=gross!==null&&cancel!==null&&Number(gross)>0?(100*Number(cancel)/Number(gross)).toFixed(1)+'%':null;
+   setRow(performance,label,[get(prefix+' Tours'),gross,cancel,loss,fmt(prefix+' Gross Conversion'),get(prefix+' Net Applications'),fmt(prefix+' Net Conversion')]);
+  }
+  const recap=table('Application recap');
+  for(const [label,key] of [['Applications received','Monthly Applications Received'],['Pending','Monthly Pending Applications'],['Approved','Monthly Approved Applications'],['Signed','Monthly Signed Leases'],['Cancelled','Monthly Cancelled Applications']]){
+   setRow(recap,label,[get(key)]);
+  }
+  root.querySelectorAll('.kpi').forEach(k=>{
+   const label=k.querySelector('label')?.textContent.trim().toLowerCase();
+   const map={'new visits':'Monthly New Visits Table Total','new applications':'Monthly Applications Received','applications received':'Monthly Applications Received','pending':'Monthly Pending Applications','approved':'Monthly Approved Applications','signed':'Monthly Signed Leases','signed leases':'Monthly Signed Leases','cancellations':'Monthly Cancelled Applications','cancelled':'Monthly Cancelled Applications','net applications':'Monthly Total Net Applications','return visits':'Monthly Return Visits Table Total'};
+   if(map[label])put(k.querySelector('strong'),get(map[label]));
+  });
+  const chart=root.querySelector('.tra-new-chart');
+  if(chart){
+   const values=Array.from({length:5},(_,i)=>Number(get('Monthly Week '+(i+1)+' New Visits'))||0),max=Math.max(1,...values);
+   chart.querySelectorAll('.tra-new-bar-row').forEach((bar,i)=>{if(i>=5)return;put(bar.querySelector('strong'),values[i]);const fill=bar.querySelector('.tra-new-bar-fill');if(fill)fill.style.width=(100*values[i]/max)+'%'});
+  }
+  const sourceChart=root.querySelectorAll('.tra-new-chart')[1];
+  if(sourceChart){
+   const rows=sourceChart.querySelectorAll('.tra-new-bar-row');
+   const values=[get('Monthly StreetEasy Leads'),get('Monthly Google Leads'),get('Monthly Website Leads')].map(v=>Number(v)||0),max=Math.max(1,...values);
+   rows.forEach((bar,i)=>{if(i>=values.length)return;put(bar.querySelector('strong'),values[i]);const fill=bar.querySelector('.tra-new-bar-fill');if(fill)fill.style.width=(100*values[i]/max)+'%'});
+  }
+  const breakdown=table('Application breakdown | By unit type');
+  if(breakdown){
+   const rows=[...breakdown.querySelectorAll('tbody tr')];
+   const types={'Studio':'Monthly Studio Applications','1BR':'Monthly 1BR Applications','2BR':'Monthly 2BR Applications','3BR':'Monthly 3BR Applications'};
+   rows.forEach(tr=>{const label=tr.cells[0]?.textContent.trim();if(types[label])put(tr.cells[1],get(types[label]));const building=tr.cells[2]?.textContent.trim();if(building==='Degraw')put(tr.cells[3],get('Monthly Degraw Applications'));if(building==='Sackett')put(tr.cells[3],get('Monthly Sackett Applications'))});
+  }
+  const note=root.querySelector('.tra-weekly-source');if(note)note.textContent='Live monthly traffic, agent performance, sources, application totals and charts from published Excel. Other detail tables remain workbook snapshots.';
+ }catch(err){console.warn('Monthly detailed live feed unavailable',err)}
+})();
+</script>
 </body></html>

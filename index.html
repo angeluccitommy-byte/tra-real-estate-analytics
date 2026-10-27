@@ -341,4 +341,43 @@ function renderSource(){let q=document.getElementById('search').value.toLowerCas
     if(note)note.appendChild(status);
   }catch(err){console.warn('TRA live feed unavailable, retaining workbook snapshot',err)}
 })();
+</script><script>
+/* Extended TRA metrics, loaded from the same public aggregate feed. */
+(async function traExtendedDaily(){
+  try{
+    const response=await fetch('./TRA_Live_Data.json?expanded='+Date.now(),{cache:'no-store'});
+    if(!response.ok) return;
+    const d=await response.json();
+    const daily=document.getElementById('daily');
+    if(!daily||!Object.prototype.hasOwnProperty.call(d,'Today First Contacts'))return;
+    const safeNum=(k)=>{const n=Number(d[k]);return Number.isFinite(n)?n:0};
+    const panel=document.createElement('section');
+    panel.className='tra-live-daily-activity';
+    panel.style.cssText='margin:22px 0 26px;padding:22px;background:white;border:1px solid #dbe8f6;border-radius:15px';
+    const title=document.createElement('h2');title.textContent='Live Daily Activity';title.style.cssText='font:normal 24px Georgia,serif;margin:0 0 6px;color:#123d72';panel.appendChild(title);
+    const subtitle=document.createElement('p');subtitle.style.cssText='font-size:12px;color:#6885a5;margin:0 0 18px';subtitle.textContent='Excel live feed · '+(d['Daily Report Date']||d['Report Date']||'Latest report')+' · Today / This week / This month';panel.appendChild(subtitle);
+    const metrics=[['First contacts','First Contacts'],['New tours','New Tours'],['Applications','Applications'],['Cancellations','Cancellations'],['Declines','Declines'],['Net applications','Net Applications']];
+    const table=document.createElement('table');table.style.cssText='width:100%;border-collapse:collapse;font-size:13px;text-align:left';
+    const thead=document.createElement('thead');const header=document.createElement('tr');
+    for(const h of ['Activity','Today','Week','Month']){const th=document.createElement('th');th.textContent=h;th.style.cssText='padding:12px 10px;border-bottom:2px solid #dbe8f6;color:#6885a5;font-size:11px;text-transform:uppercase';header.appendChild(th)}
+    thead.appendChild(header);table.appendChild(thead);
+    const tbody=document.createElement('tbody');
+    for(const [label,key] of metrics){const tr=document.createElement('tr');for(const val of [label,safeNum('Today '+key),safeNum('Week '+key),safeNum('Month '+key)]){const td=document.createElement('td');td.textContent=val;td.style.cssText='padding:11px 10px;border-bottom:1px solid #edf4fc';tr.appendChild(td)}tbody.appendChild(tr)}
+    table.appendChild(tbody);const scroll=document.createElement('div');scroll.style.overflowX='auto';scroll.appendChild(table);panel.appendChild(scroll);
+    const chartGrid=daily.querySelector('.tra-chart-grid');if(chartGrid)chartGrid.insertAdjacentElement('beforebegin',panel);else daily.appendChild(panel);
+    const typeCard=daily.querySelectorAll('.tra-chart-grid .tra-chart-card')[1];
+    if(typeCard){
+      const rows=typeCard.querySelectorAll('.tra-type-row');
+      for(let i=0;i<Math.min(rows.length,4);i++){const type=['Studio','1BR','2BR/2BA','3BR'][i],total=safeNum('Market '+type+' Total'),signed=safeNum('Market '+type+' Signed');if(!total)continue;const pct=(signed/total*100).toFixed(1);const fill=rows[i].querySelector('.tra-type-fill'),label=rows[i].querySelector('b');if(fill)fill.style.width=pct+'%';if(label)label.textContent=pct+'%'}
+      const foot=typeCard.querySelector('.tra-chart-foot');if(foot)foot.textContent='Live Excel counts by unit type, updated '+(d['Report Date']||'from the latest publication')+'.';
+    }
+    const weekly=document.getElementById('weekly');
+    if(weekly){
+      const cards=weekly.querySelectorAll('.kpis .kpi');
+      const keys=['Weekly New Visits','Weekly Return Visits','Weekly New Applications','Weekly Approved Applications','Weekly Signed Leases','Weekly Cancellations','Weekly Net Applications'];
+      keys.forEach((key,i)=>{const el=cards[i]?.querySelector('strong');if(el&&d[key]!==undefined)el.textContent=safeNum(key)});
+      const src=weekly.querySelector('.tra-weekly-source');if(src)src.textContent='Live weekly summary updated '+(d['Report Date']||'from Excel')+'. Detailed tables below may still reflect the earlier workbook snapshot.';
+    }
+  }catch(e){console.warn('Extended TRA feed unavailable; original dashboard preserved',e)}
+})();
 </script></body></html>

@@ -459,7 +459,7 @@ function renderSource(){let q=document.getElementById('search').value.toLowerCas
     const panel=document.createElement('section');
     panel.className='tra-live-daily-activity';
     panel.style.cssText='margin:22px 0 26px;padding:22px;background:white;border:1px solid #f3eee5;border-radius:15px';
-    const title=document.createElement('h2');title.textContent='Live Daily Activity';title.style.cssText='font:normal 24px Georgia,serif;margin:0 0 6px;color:#604b24';panel.appendChild(title);
+    const title=document.createElement('h2');title.textContent='Daily Activity & Leasing';title.style.cssText='font:normal 24px Georgia,serif;margin:0 0 6px;color:#604b24';panel.appendChild(title);
     const subtitle=document.createElement('p');subtitle.style.cssText='font-size:12px;color:#9c8d71;margin:0 0 18px';subtitle.textContent='Excel live feed · '+(d['Daily Report Date']||d['Report Date']||'Latest report')+' · Today / This week / This month';panel.appendChild(subtitle);
     const metrics=[['First contacts','First Contacts'],['New tours','New Tours'],['Applications','Applications'],['Cancellations','Cancellations'],['Declines','Declines'],['Net applications','Net Applications']];
     const table=document.createElement('table');table.style.cssText='width:100%;border-collapse:collapse;font-size:13px;text-align:left';
@@ -469,7 +469,7 @@ function renderSource(){let q=document.getElementById('search').value.toLowerCas
     const tbody=document.createElement('tbody');
     for(const [label,key] of metrics){const tr=document.createElement('tr');for(const val of [label,safeNum('Today '+key),safeNum('Week '+key),safeNum('Month '+key)]){const td=document.createElement('td');td.textContent=val;td.style.cssText='padding:11px 10px;border-bottom:1px solid #fbf8f4';tr.appendChild(td)}tbody.appendChild(tr)}
     table.appendChild(tbody);const scroll=document.createElement('div');scroll.style.overflowX='auto';scroll.appendChild(table);panel.appendChild(scroll);
-    const chartGrid=daily.querySelector('.tra-chart-grid');if(chartGrid)chartGrid.insertAdjacentElement('beforebegin',panel);else daily.appendChild(panel);
+    const firstSection=daily.querySelector('.sectiontitle');if(firstSection)firstSection.insertAdjacentElement('beforebegin',panel);else daily.appendChild(panel);
     const typeCard=daily.querySelectorAll('.tra-chart-grid .tra-chart-card')[1];
     if(typeCard){
       const rows=typeCard.querySelectorAll('.tra-type-row');

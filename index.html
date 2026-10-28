@@ -281,6 +281,35 @@ button,input,select{touch-action:manipulation}
 }
 @media(max-width:390px){.main{padding:18px 10px 40px}.side{padding-left:10px;padding-right:10px}.side nav{margin-left:-10px!important;margin-right:-10px!important;padding-left:10px}.kpi{padding:12px 10px}.kpi strong{font-size:25px}.panel{padding:13px}#traLogout{right:10px!important}}
 @media(prefers-reduced-motion:reduce){.side nav button{transition:none}}
+</style><style id="tra-black-gold-editorial">
+/* TRA Signature: midnight black, champagne gold and restrained jewel-fruit accents */
+:root{--deep:#111318;--green:#b48b4a;--mint:#f4eee1;--pale:#f8f7f3;--ink:#242322;--muted:#746e66;--line:#e6dfd2;--white:#fff;--accent:#d8b77a}
+body{background:#f8f7f3;color:#242322}
+.side{background:linear-gradient(165deg,#0b0c0f 0%,#1a1a1d 67%,#30251c 100%);border-right:1px solid #9c7b44;box-shadow:4px 0 26px #17130c17}
+.side .logo{color:#d8b77a;text-shadow:0 1px 0 #000}
+.side .tag{color:#d6c9b3}
+.side nav button{color:#e9e4d9}
+.side nav button.active{background:linear-gradient(105deg,#d4b477,#b98f4c);color:#171410;font-weight:750}
+.side nav button:hover:not(.active){background:#d8b77a22}
+#traLogout{background:#252226!important;border-color:#9e8053!important;color:#f5e8cf!important}
+.main{background:#f8f7f3}
+.headline h1{color:#1e1b19}
+.eyebrow{color:#997641;letter-spacing:.22em}
+.chip{background:#f5ecdc;border-color:#ddcba9;color:#76582d}
+.kpi,.panel{background:#fffefa;border-color:#e7ddcb;box-shadow:0 7px 28px #3e2b1010}
+.kpi{border-top:3px solid #c5a36b}
+.kpi:nth-child(4n + 2){border-top-color:#7d3446}
+.kpi:nth-child(4n + 3){border-top-color:#3d7068}
+.kpi:nth-child(4n + 4){border-top-color:#b48b4a}
+.kpi strong{color:#28201b}
+.kpi label{color:#827467}
+.kpi .foot{color:#8a8175}
+.panel h3,.sectiontitle h2{color:#28211d}
+.notice{background:#fbf4e8;border-color:#e9d9bb;color:#6f5c42}
+.view table{border-color:#e8dfd1}
+.view th{color:#5d4b35}
+.view :is(a,button):focus-visible,.side nav button:focus-visible{outline:2px solid #b68d50;outline-offset:3px}
+@media(max-width:720px){.side{border-right:0;border-bottom:1px solid #9c7b44}.side nav button.active{background:#d4b477;color:#171410}}
 </style></head><body><div class="app"><aside class="side"><div class="logo">TRA</div><div class="tag">TOTAL REAL ESTATE ANALYTICS</div><nav><button class="active" data-view="daily" onclick="setView('daily')">Daily Report</button><button data-view="weekly" onclick="setView('weekly')">Weekly Report</button><button data-view="monthly" onclick="setView('monthly')">Monthly Report</button><button data-view="inventory" onclick="setView('inventory')">Master Inventory</button><button data-view="absorption" onclick="setView('absorption')">Absorption Schedule</button><button data-view="stacking" onclick="setView('stacking')">Stacking Plan</button><button data-view="financial" onclick="setView('financial')">Financial Analytics</button><button data-view="overview" onclick="setView('overview')">Dashboard</button></nav><button id="traLogout" type="button" style="position:absolute;bottom:113px;left:18px;right:18px;width:calc(100% - 36px);padding:12px 15px;background:#235c95;border:1px solid #679ac7;border-radius:9px;color:white;font-weight:700;text-align:left;cursor:pointer">↪ Log Out</button><div class="sidefooter">Society Brooklyn<br/>Market-rate leasing<br/><br/>Phase 1 · Workbook snapshot</div></aside><main class="main">
 <section class="view active" id="daily"><div class="headline"><div><div class="eyebrow">Society Brooklyn / Market portfolio</div><h1>Daily Report</h1><p>Your leasing performance, simplified.</p></div><span class="chip">Market-rate only · Inventory</span></div><div class="notice">Workbook snapshot, not a live OneDrive connection. Market inventory metrics are verified from the saved report; activity tables retain the workbook’s own reporting scope.</div>
 <div class="kpis"><div class="kpi"><label>Market units</label><strong>384</strong><div class="foot">Market inventory</div></div><div class="kpi"><label>Signed units</label><strong>341</strong><div class="foot">October 24 workbook</div></div><div class="kpi"><label>Available units</label><strong>33</strong><div class="foot">October 24 workbook</div></div><div class="kpi"><label>Market leased</label><strong>88.8%</strong><div class="foot">341 of 384 market units</div></div></div>

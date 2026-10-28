@@ -669,4 +669,25 @@ document.getElementById('traLogout')?.addEventListener('click',async function(){
  catch(e){alert('Could not sign out: '+e.message);this.disabled=false;this.textContent='↪ Log Out'}
 });
 </script>
-</body></html>
+<script type="module" id="tra-expiry-live">
+import {getExpirationRecords} from './tra-secure-data.js';
+const escapeText=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>{const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const p=Object.fromEntries(parts.map(x=>[x.type,x.value]));return Date.UTC(+p.year,+p.month-1,+p.day)};
+const fmt=x=>x?new Date(x+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+const money=x=>x==null?'':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(x);
+async function render(type){
+ const view=document.getElementById(type);if(!view)return;
+ const panel=view.querySelector('.panel');if(!panel)return;
+ const empty=panel.querySelector('.tra-expiry-empty');
+ if(empty)empty.textContent='Loading secured report…';
+ try{
+ const rows=await getExpirationRecords(type);const limit=type==='leases'?90:60;const now=today();
+ const filtered=rows.map(r=>({...r,days:Math.round((Date.parse(r.event_date+'T00:00:00Z')-now)/86400000)})).filter(r=>r.days>=0&&r.days<=limit).sort((a,b)=>a.days-b.days);
+ const label=type==='leases'?'Lease Expiration':'Rider Date';
+ const h='<div class="tra-expiry-table-wrap"><table class="tra-expiry-table"><thead><tr>'+['Building','Unit','Floor','Type','Tenant','Status','Gross Rent','Lease Start',label,'Days Left','Notes'].map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+filtered.map(r=>'<tr>'+[r.building,r.unit_id,r.floor,r.unit_type,r.tenant_name,r.lease_status,money(r.gross_rent),fmt(r.lease_start),fmt(r.event_date),r.days,r.notes].map(x=>'<td>'+escapeText(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+ panel.innerHTML='<h3>'+label+' Schedule</h3><p class="sub">'+filtered.length+' upcoming records within '+limit+' days. Data last imported from Excel, not automatically synced from OneDrive.</p>'+(filtered.length?h:'<div class="tra-expiry-empty">No upcoming dates in this window.</div>');
+ const notice=view.querySelector('.notice');if(notice)notice.textContent='Secure Supabase report • '+filtered.length+' upcoming records • Last imported workbook snapshot. Automatic OneDrive sync is not yet configured.';
+ }catch(e){if(empty)empty.textContent='Could not load secure records. '+e.message;}
+}
+render('leases');render('riders');
+</script><style id="tra-expiry-live-css">.tra-expiry-table-wrap{width:100%;overflow-x:auto}.tra-expiry-table{border-collapse:collapse;min-width:1120px;width:100%;font-size:12px}.tra-expiry-table th{text-align:left;background:#211d18;color:#e6c985;padding:13px 10px;white-space:nowrap}.tra-expiry-table td{padding:12px 10px;border-bottom:1px solid #ede6d9;color:#3e362c}.tra-expiry-table tr:nth-child(even){background:#fbf8f3}</style></body></html>

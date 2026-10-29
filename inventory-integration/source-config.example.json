@@ -1,0 +1,8 @@
+{
+  "expected_counts": {"total": 517, "market": 384, "affordable": 133},
+  "graph_item_url": "REQUIRED: verified Graph drive item metadata URL",
+  "download_hosts": [],
+  "header_row": null,
+  "columns": {},
+  "expected_headers": {}
+}

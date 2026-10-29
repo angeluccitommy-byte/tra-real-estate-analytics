@@ -1,0 +1,5 @@
+# Merge only this new function entry into a reviewed Supabase config.
+# Do not replace the project's existing config.toml.
+# Requests are authenticated by the separate Vault-backed invocation hook.
+[functions.tra-inventory-sync]
+verify_jwt = false

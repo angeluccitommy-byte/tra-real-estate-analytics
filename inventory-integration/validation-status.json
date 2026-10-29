@@ -1,0 +1,58 @@
+{
+  "branch": "feature/tra-master-inventory",
+  "deployment_package_finalized": true,
+  "deployed": false,
+  "dashboard_activated": false,
+  "new_schedule_installed": false,
+  "new_schedule_activated": false,
+  "existing_production_sync_modified": false,
+  "acceptance_counts": {
+    "total": 517,
+    "market": 384,
+    "affordable": 133
+  },
+  "field_contract": "33 fields including outdoor_space and direction; no tenant names, notes or agent names",
+  "committed_fixture_type": "generated synthetic data only; no private workbook rows or validation payloads",
+  "local_validation": {
+    "python_tests": 13,
+    "dashboard_reader_model_tests": 4,
+    "workbook_parser_tests": 3,
+    "database": "isolated PGlite with simulated cron/Vault",
+    "edge_handler": "mocked platform boundaries",
+    "browser": "synthetic complete inventory",
+    "manual_activation_gate": "requires externally validated source plus actual access and UI checks"
+  },
+  "source_date_policy": "Accepted external-report flags remain nonblocking; actual unit identifiers and dates are runtime inputs, never embedded here",
+  "permissions": {
+    "remote_grants_verified": false,
+    "worker_deployment_credentials_present": false,
+    "preflight": "deployment_preflight.sql"
+  },
+  "dependency": {
+    "name": "SheetJS",
+    "version": "0.20.3",
+    "artifact": "supabase/functions/tra-inventory-sync/vendor/xlsx.mjs",
+    "present": false,
+    "official_url": "https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs",
+    "trusted_sha256": null
+  },
+  "secure_binding_names": {
+    "edge_db": "SUPABASE_DB_URL",
+    "vault": [
+      "tra_inventory_invocation",
+      "tra_inventory_refresh_token"
+    ],
+    "validator": [
+      "TRA_INVENTORY_SERVICE_ROLE_KEY",
+      "TRA_INVENTORY_APPROVED_READER_TOKEN",
+      "TRA_INVENTORY_UNAPPROVED_READER_TOKEN"
+    ]
+  },
+  "pending": [
+    "working Supabase/CDN network access",
+    "authorized deployment/database connection",
+    "verified SheetJS 0.20.3 artifact and real XLSM comparison",
+    "independent inventory Vault bindings and approved-reader setup",
+    "successful manual live import before dashboard/schedule activation"
+  ]
+}

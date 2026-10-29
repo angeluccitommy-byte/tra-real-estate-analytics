@@ -1,0 +1,8 @@
+# New local deployment config; only the separate function is declared.
+# Always deploy with --project-ref bluavamwhplpyuzeppfc and its explicit name.
+project_id = "tra-real-estate-analytics"
+
+[functions.tra-inventory-sync]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/tra-inventory-sync/index.ts"

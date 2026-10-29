@@ -1,0 +1,200 @@
+[
+  {
+    "csv_header": "Building",
+    "field": "building",
+    "sql_type": "text",
+    "source_key": "building"
+  },
+  {
+    "csv_header": "Unit ID",
+    "field": "unit_id",
+    "sql_type": "text",
+    "source_key": "unit_id"
+  },
+  {
+    "csv_header": "Floor",
+    "field": "floor",
+    "sql_type": "integer",
+    "source_key": "floor"
+  },
+  {
+    "csv_header": "Unit Type",
+    "field": "unit_type",
+    "sql_type": "text",
+    "source_key": "unit_type"
+  },
+  {
+    "csv_header": "Bed",
+    "field": "bedrooms",
+    "sql_type": "integer",
+    "source_key": "bedrooms"
+  },
+  {
+    "csv_header": "Bath",
+    "field": "bathrooms",
+    "sql_type": "numeric",
+    "source_key": "bathrooms"
+  },
+  {
+    "csv_header": "SF",
+    "field": "square_feet",
+    "sql_type": "integer",
+    "source_key": "square_feet"
+  },
+  {
+    "csv_header": "Mkt / Aff",
+    "field": "inventory_category",
+    "sql_type": "text",
+    "source_key": "program"
+  },
+  {
+    "csv_header": "Status",
+    "field": "lease_status",
+    "sql_type": "text",
+    "source_key": "status"
+  },
+  {
+    "csv_header": "Gross Rent",
+    "field": "gross_rent",
+    "sql_type": "numeric",
+    "source_key": "gross_rent"
+  },
+  {
+    "csv_header": "Free Months",
+    "field": "free_months",
+    "sql_type": "numeric",
+    "source_key": "free_months"
+  },
+  {
+    "csv_header": "Lease Term",
+    "field": "lease_term_months",
+    "sql_type": "numeric",
+    "source_key": "lease_term"
+  },
+  {
+    "csv_header": "Net Effective",
+    "field": "net_effective_rent",
+    "sql_type": "numeric",
+    "source_key": "net_effective"
+  },
+  {
+    "csv_header": "Gross Rent $/SF/Yr",
+    "field": "gross_rent_psf_year",
+    "sql_type": "numeric",
+    "source_key": "gross_rent_psf_year"
+  },
+  {
+    "csv_header": "Net Rent $/SF/Yr",
+    "field": "net_rent_psf_year",
+    "sql_type": "numeric",
+    "source_key": "net_rent_psf_year"
+  },
+  {
+    "csv_header": "Early Occ Start",
+    "field": "early_occupancy_start",
+    "sql_type": "date",
+    "source_key": "early_occupancy_start"
+  },
+  {
+    "csv_header": "Lease Start Date",
+    "field": "lease_start",
+    "sql_type": "date",
+    "source_key": "lease_start"
+  },
+  {
+    "csv_header": "Early Cancellation Option",
+    "field": "early_cancellation_date",
+    "sql_type": "date",
+    "source_key": "early_cancellation_option"
+  },
+  {
+    "csv_header": "Lease Expiration",
+    "field": "lease_expiration",
+    "sql_type": "date",
+    "source_key": "lease_expiration"
+  },
+  {
+    "csv_header": "Actual Occupancy",
+    "field": "actual_occupancy",
+    "sql_type": "numeric",
+    "source_key": "actual_occupancy"
+  },
+  {
+    "csv_header": "Total Free Rent",
+    "field": "total_free_rent",
+    "sql_type": "numeric",
+    "source_key": "total_free_rent"
+  },
+  {
+    "csv_header": "Gross Monthly",
+    "field": "gross_monthly",
+    "sql_type": "numeric",
+    "source_key": "gross_monthly"
+  },
+  {
+    "csv_header": "Gross Annualized",
+    "field": "gross_annualized",
+    "sql_type": "numeric",
+    "source_key": "gross_annualized"
+  },
+  {
+    "csv_header": "Monthly Net Eff",
+    "field": "monthly_net_effective",
+    "sql_type": "numeric",
+    "source_key": "monthly_net_effective"
+  },
+  {
+    "csv_header": "Annualized Net Rent",
+    "field": "annualized_net_rent",
+    "sql_type": "numeric",
+    "source_key": "annualized_net_rent"
+  },
+  {
+    "csv_header": "Annual Net PPSF",
+    "field": "annual_net_psf",
+    "sql_type": "numeric",
+    "source_key": "annual_net_psf"
+  },
+  {
+    "csv_header": "Date of Application",
+    "field": "application_date",
+    "sql_type": "date",
+    "source_key": "application_date"
+  },
+  {
+    "csv_header": "Signed Date",
+    "field": "signed_date",
+    "sql_type": "date",
+    "source_key": "signed_date"
+  },
+  {
+    "csv_header": "Base Gross Rent (fallback, no Approved round)",
+    "field": "base_gross_rent",
+    "sql_type": "numeric",
+    "source_key": "base_gross_rent"
+  },
+  {
+    "csv_header": "Net OP",
+    "field": "net_op",
+    "sql_type": "numeric",
+    "source_key": "net_op"
+  },
+  {
+    "csv_header": "Gross OP",
+    "field": "gross_op",
+    "sql_type": "numeric",
+    "source_key": "gross_op"
+  },
+  {
+    "csv_header": "Outdoor Space",
+    "field": "outdoor_space",
+    "sql_type": "text",
+    "source_key": "outdoor_space"
+  },
+  {
+    "csv_header": "Direction",
+    "field": "direction",
+    "sql_type": "text",
+    "source_key": "direction"
+  }
+]

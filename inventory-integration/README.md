@@ -1,11 +1,14 @@
 # TRA Master Inventory deployment package
 
-Prepared for Supabase project `bluavamwhplpyuzeppfc`. Nothing is deployed or
-activated. Production `tra-onedrive-sync` v5, cron job 1 (`*/5 * * * *`), existing
-report tables, sync configuration and dashboard HTML remain unchanged.
+Website integration for Supabase project `bluavamwhplpyuzeppfc` is wired into the
+existing index.html. Nothing has been deployed to production by this task. Production `tra-onedrive-sync` v5, cron job 1 (`*/5 * * * *`), existing
+report tables and sync configuration remain unchanged. Only the inventory section
+and its scoped assets are integrated into the current dashboard.
 
-Use [DEPLOYMENT.md](DEPLOYMENT.md) for permissions, secrets, prerequisites and the
-ordered manual-validation rollout. [field-mapping.json](field-mapping.json) is the
+For the initial verified-snapshot website launch, use
+[SNAPSHOT_LAUNCH.md](SNAPSHOT_LAUNCH.md). It does not need Microsoft OAuth,
+SheetJS, a new Edge deployment or a scheduled job. [DEPLOYMENT.md](DEPLOYMENT.md)
+describes the separate later automated-workbook rollout. [field-mapping.json](field-mapping.json) is the
 final machine-readable source/field/type contract.
 
 ## Accepted inventory contract
@@ -44,7 +47,7 @@ configuration, not a bundled workbook dataset.
   filters, search, combined building/status/layout filters, numeric/natural sorting,
   pagination, category KPIs, unit mix and all 33 fields in apartment details.
   Outdoor Space and Direction are preserved and displayed as source text.
-- `bootstrap.mjs`: leaves the existing tab untouched until the database readiness
+- `bootstrap.mjs`: displays a safe unavailable state until the database readiness
   gate passes. This module is not wired into the current dashboard yet.
 - `validate_latest_export.py`: strict latest-header adapter and local candidate
   validation, including the accepted external report's date flag.
@@ -80,7 +83,10 @@ mechanism and its credentials are not requirements for the Edge Function.
   changed data fails validation, readiness changes only after successful checks,
   and job 1 remains unchanged. No actual pg_cron job was run.
 
-Real Supabase/OAuth/Graph/SheetJS deployment checks remain blocked; see the runbook.
+Real Supabase and production hosting checks are handled through the user’s connected
+integration; this runtime remains proxy-blocked. The new actual-site test uses the
+real verified export and real isolated PostgreSQL RLS; see SNAPSHOT_LAUNCH.md.
+OAuth/Graph/SheetJS are not requirements for the initial snapshot launch.
 Previous complete batches are intentionally retained; agree a retention policy
 before removing any historical data needed by pinned readers or audit evidence.
 

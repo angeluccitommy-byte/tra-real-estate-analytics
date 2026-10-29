@@ -123,3 +123,6 @@ if(typeof document!=='undefined'){
   else window.addEventListener('load',startAutomaticRefresh,{once:true});
 }
 
+
+// Reuse the existing authenticated project client for Master Inventory.
+export {supabase as traSupabase};

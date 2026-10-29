@@ -49,10 +49,18 @@
     ]
   },
   "pending": [
-    "working Supabase/CDN network access",
-    "authorized deployment/database connection",
-    "verified SheetJS 0.20.3 artifact and real XLSM comparison",
-    "independent inventory Vault bindings and approved-reader setup",
-    "successful manual live import before dashboard/schedule activation"
-  ]
+    "Apply reviewed snapshot inventory migrations and seed verified export via authorized connected integration",
+    "Verify real production Supabase approved/unapproved RLS and record manual release gate",
+    "Publish feature commit through existing GitHub Pages source/workflow",
+    "Verify production URL and deployment commit"
+  ],
+  "website_wired_into_existing_index": true,
+  "verified_snapshot_locally_validated": true,
+  "verified_rows_checked": 517,
+  "verified_fields_checked": 33,
+  "daily_weekly_monthly_unchanged": true,
+  "supabase_setup_assigned_to": "user connected Supabase integration",
+  "launch_mode": "verified snapshot; automatic inventory refresh disabled",
+  "production_url_verified": false,
+  "target_production_url": "https://traanalytics.com/"
 }

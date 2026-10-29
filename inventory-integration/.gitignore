@@ -12,3 +12,9 @@ source-config.local.json
 *.xlsm
 *.zip
 *.log
+
+snapshot-rpc-payload.json
+inventory-candidate.json
+inventory-validation.json
+*manual-validation.json
+*website-validation.json

@@ -1,4 +1,9 @@
-# Deployment runbook — separate Master Inventory
+# Later automated-workbook deployment runbook — separate Master Inventory
+
+**Initial website launch:** use SNAPSHOT_LAUNCH.md instead. That path loads the
+verified snapshot and deliberately skips the new Edge Function, Microsoft OAuth,
+SheetJS and schedule 002. The website is now wired; the older automation-specific
+steps below are not prerequisites for the initial launch.
 
 Target project: `bluavamwhplpyuzeppfc`. Function/job: **tra-inventory-sync**.
 Protected production function/job: **tra-onedrive-sync v5**, cron job **1**, active

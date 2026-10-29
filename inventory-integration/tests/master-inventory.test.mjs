@@ -29,11 +29,14 @@ test('all pages use the same batch, private fields excluded, failures reject par
  await assert.rejects(loadInventory(client(true)),/incomplete/);
  await assert.rejects(loadInventory(client(false,true)),/completeness/);
 });
-test('unvalidated bootstrap leaves the existing tab untouched',async()=>{
+test('unvalidated bootstrap displays a safe unavailable state',async()=>{
  const {mountValidatedInventory}=await import('../bootstrap.mjs');
- const root={innerHTML:'historical snapshot'};
+ const notice={},retry={};
+ const root={dataset:{},innerHTML:'',querySelector:selector=>selector==='[role="status"]'?notice:retry};
  assert.deepEqual(await mountValidatedInventory({rpc:async()=>({data:false})},root),{mounted:false});
  assert.deepEqual(await mountValidatedInventory({rpc:async()=>({error:new Error('not deployed')})},root),{mounted:false});
  assert.deepEqual(await mountValidatedInventory({rpc:async()=>{throw new Error('network')}},root),{mounted:false});
- assert.equal(root.innerHTML,'historical snapshot');
+ assert.equal(root.dataset.inventoryState,'unavailable');
+ assert.ok(root.innerHTML.includes('Master Inventory'));
+ assert.equal(typeof retry.onclick,'function');
 });

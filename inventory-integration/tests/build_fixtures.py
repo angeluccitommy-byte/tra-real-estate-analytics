@@ -15,7 +15,7 @@ rows=[{field:row[header] for header,field in HEADERS.items()} for row in csv.Dic
 for row in rows:
     if row['unit_id']=='TEST-0003':row['lease_expiration']='1/2/999'
 header_labels={field:header for header,field in HEADERS.items()}
-known={'building':'A','unit_id':'B','floor':'C','unit_type':'D','bedrooms':'E','bathrooms':'F','square_feet':'G','program':'J','status':'K','gross_rent':'L','lease_start':'V','early_cancellation_option':'W','lease_expiration':'X','actual_occupancy':'Y'}
+known={'building': 'A', 'unit_id': 'B', 'floor': 'C', 'unit_type': 'D', 'bedrooms': 'E', 'bathrooms': 'F', 'square_feet': 'G', 'outdoor_space': 'H', 'direction': 'I', 'program': 'J', 'status': 'K', 'gross_rent': 'L', 'free_months': 'M', 'lease_term': 'N', 'net_effective': 'O', 'gross_rent_psf_year': 'Q', 'net_rent_psf_year': 'R', 'early_occupancy_start': 'U', 'lease_start': 'V', 'early_cancellation_option': 'W', 'lease_expiration': 'X', 'actual_occupancy': 'Y', 'total_free_rent': 'Z', 'gross_monthly': 'AA', 'gross_annualized': 'AB', 'monthly_net_effective': 'AC', 'annualized_net_rent': 'AD', 'annual_net_psf': 'AE', 'application_date': 'AF', 'signed_date': 'AG', 'base_gross_rent': 'AH', 'net_op': 'AK', 'gross_op': 'AL'}
 def column(n):
     s=''
     while n:

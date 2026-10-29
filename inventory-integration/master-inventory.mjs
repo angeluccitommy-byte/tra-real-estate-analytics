@@ -1,4 +1,4 @@
-// Inactive until explicitly mounted after deployment/RLS/import validation.
+// Mounted only inside the existing authenticated TRA inventory view after its RLS/readiness gate.
 export const FIELDS = ['building','unit_id','floor','unit_type','bedrooms','bathrooms','square_feet','inventory_category','lease_status','gross_rent','free_months','lease_term_months','net_effective_rent','gross_rent_psf_year','net_rent_psf_year','early_occupancy_start','lease_start','early_cancellation_date','lease_expiration','actual_occupancy','total_free_rent','gross_monthly','gross_annualized','monthly_net_effective','annualized_net_rent','annual_net_psf','application_date','signed_date','base_gross_rent','outdoor_space','net_op','gross_op','direction'];
 export const COLUMNS = [['building','Building'],['unit_id','Apartment'],['unit_type','Layout'],['square_feet','SF'],['lease_status','Status'],['gross_rent','Gross rent'],['net_effective_rent','Net effective'],['free_months','Free months'],['lease_term_months','Lease term']];
 const numeric = new Set(['floor','bedrooms','bathrooms','square_feet','gross_rent','free_months','lease_term_months','net_effective_rent','gross_rent_psf_year','net_rent_psf_year','actual_occupancy','total_free_rent','gross_monthly','gross_annualized','monthly_net_effective','annualized_net_rent','annual_net_psf','base_gross_rent','net_op','gross_op']);
@@ -19,7 +19,7 @@ export function selectRows(rows,state) {
   });
 }
 export async function loadInventory(client) {
-  const {data:batch,error}=await client.from('tra_inventory_batches').select('id,synced_at,total_units,market_units,affordable_units,date_issues').eq('active',true).single();
+  const {data:batch,error}=await client.from('tra_inventory_batches').select('id,synced_at,source_revision,total_units,market_units,affordable_units,date_issues').eq('active',true).single();
   if(error||!batch)throw new Error('No authorized complete inventory batch is available');
   if(!Number.isInteger(batch.total_units)||batch.total_units<=0)throw new Error('Invalid inventory batch count');
   const rows=[];
@@ -30,7 +30,7 @@ export async function loadInventory(client) {
   }
   const unique=new Set(rows.map(r=>JSON.stringify([r.building,r.unit_id])));
   if(rows.length!==batch.total_units||unique.size!==rows.length||rows.filter(r=>r.inventory_category==='Market').length!==batch.market_units||rows.filter(r=>r.inventory_category==='Affordable').length!==batch.affordable_units||batch.market_units+batch.affordable_units!==batch.total_units)throw new Error('Inventory batch failed completeness validation');
-  if(rows.some(r=>!r.building||!r.unit_id||!r.lease_status||Object.keys(r).some(k=>!FIELDS.includes(k))))throw new Error('Unexpected inventory record shape');
+  if(rows.some(r=>!r.building||!r.unit_id||!r.lease_status||Object.keys(r).length!==FIELDS.length||Object.keys(r).some(k=>!FIELDS.includes(k))))throw new Error('Unexpected inventory record shape');
   return {rows,batch};
 }
 const esc=v=>String(v??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -38,6 +38,7 @@ const display=(value,key)=>value==null?'—':['gross_rent','net_effective_rent']
 export async function mountMasterInventory(client,root) {
   const state={category:'Market',building:'',status:'',layout:'',search:'',sort:'building',direction:'asc',page:0};
   let current, selected=null, stopped=false,refreshing=false;
+  root.dataset.inventoryState='loading';
   root.innerHTML='<div class="notice" role="status">Loading authorized inventory…</div>';
   function render(){
     if(stopped)return;
@@ -50,26 +51,27 @@ export async function mountMasterInventory(client,root) {
     const filtered=selectRows(rows,state),stats=kpis(base),pages=Math.max(1,Math.ceil(filtered.length/18));state.page=Math.min(state.page,pages-1);
     const options=(values,selected)=>values.map(([v,label])=>`<option value="${esc(v)}" ${v===selected?'selected':''}>${esc(label)}</option>`).join('');
     const select=(name,label,values)=>`<select aria-label="${label}" data-filter="${name}">${options([['',`All ${label.toLowerCase()}`],...values.map(v=>[v,v])],state[name])}</select>`;
-    root.innerHTML=`<div class="headline"><div><div class="eyebrow">TRA / Live inventory</div><h1>Master Inventory</h1><p>Apartment-level visibility across the portfolio.</p></div><span class="chip">${esc(state.category||'All')} units</span></div>
-    <div class="notice" role="status">Inventory import: ${esc(new Date(batch.synced_at).toLocaleString('en-US',{timeZone:'America/New_York'}))} ET · ${batch.date_issues?.length||0} dates flagged for source correction. Invalid dates display —.</div>
+    root.innerHTML=`<div class="headline"><div><div class="eyebrow">TRA / Master inventory</div><h1 id="inventory-title">Master Inventory</h1><p>Apartment-level visibility across the portfolio.</p></div><span class="chip">${esc(state.category||'All')} units</span></div>
+    <div class="notice" role="status" aria-live="polite">${batch.source_revision?.startsWith('snapshot:')?'Verified workbook snapshot · Automatic refresh is off · Imported':'Workbook inventory imported'}: ${esc(new Date(batch.synced_at).toLocaleString('en-US',{timeZone:'America/New_York'}))} ET · ${batch.date_issues?.length||0} dates flagged for source correction. Invalid dates display —.</div>
     <div class="kpis">${[['Inventory',stats.total],['Available',stats.available],['Signed',stats.signed],['Leased %',stats.leased]].map(([label,value])=>`<div class="kpi"><label>${label}</label><strong>${esc(value)}</strong><div class="foot">${esc(state.category||'All')} portfolio</div></div>`).join('')}</div>
     <div class="panel"><div class="invtools"><select data-filter="category" aria-label="Inventory program">${options([['Market','Market'],['Affordable','Affordable'],['','All programs']],state.category)}</select><input class="search" aria-label="Search units" data-filter="search" placeholder="Search unit, layout, building…" value="${esc(state.search)}">${select('building','Buildings',available('building'))}${select('status','Statuses',available('lease_status'))}${select('layout','Layouts',available('unit_type'))}<button data-action="reset">Reset</button></div>
-    <div class="sub" style="margin:15px 0">${filtered.length} apartments match your filters</div><div class="invtable"><table><thead><tr>${COLUMNS.map(([key,label])=>`<th aria-sort="${state.sort===key?(state.direction==='asc'?'ascending':'descending'):'none'}"><button data-sort="${key}">${label}</button></th>`).join('')}<th>Details</th></tr></thead><tbody>${filtered.slice(state.page*18,(state.page+1)*18).map(r=>`<tr>${COLUMNS.map(([key])=>`<td>${esc(display(r[key],key))}</td>`).join('')}<td><button class="viewbtn" data-unit="${esc(JSON.stringify([r.building,r.unit_id]))}">View</button></td></tr>`).join('')||'<tr><td colspan="10">No matching apartments</td></tr>'}</tbody></table></div>
+    <div class="sub" data-inventory-summary style="margin:15px 0">${filtered.length} apartments match your filters</div><div class="invtable"><table aria-label="Master Inventory apartments"><thead><tr>${COLUMNS.map(([key,label])=>`<th aria-sort="${state.sort===key?(state.direction==='asc'?'ascending':'descending'):'none'}"><button data-sort="${key}">${label}</button></th>`).join('')}<th>Details</th></tr></thead><tbody>${filtered.slice(state.page*18,(state.page+1)*18).map(r=>`<tr>${COLUMNS.map(([key])=>`<td>${esc(display(r[key],key))}</td>`).join('')}<td><button class="viewbtn" data-unit="${esc(JSON.stringify([r.building,r.unit_id]))}">View</button></td></tr>`).join('')||'<tr><td colspan="10">No matching apartments</td></tr>'}</tbody></table></div>
     <div class="invpager"><button data-action="previous" ${state.page===0?'disabled':''}>Previous</button><span>Page ${state.page+1} of ${pages}</span><button data-action="next" ${state.page===pages-1?'disabled':''}>Next</button></div>
-    <div class="sectiontitle"><h2>Unit Mix</h2><small>${esc(state.category||'All')} portfolio</small></div><div class="panel">${available('unit_type').map(type=>`<div class="mixitem"><strong>${esc(type)}</strong><span>${base.filter(r=>r.unit_type===type).length}</span></div>`).join('')}</div>
-    <div class="sectiontitle"><h2>Apartment Detail</h2></div><div class="panel">${selected?`<div class="detailgrid">${FIELDS.map(key=>`<div class="detailfield"><small>${esc(key.replaceAll('_',' '))}</small><strong>${esc(display(selected[key],key))}</strong></div>`).join('')}</div>`:'Choose “View” on any apartment above.'}</div></div>`;
+    <div class="sectiontitle"><h2>Unit Mix</h2><small>${esc(state.category||'All')} portfolio</small></div><div class="panel">${available('unit_type').map(type=>{const count=base.filter(r=>r.unit_type===type).length;return `<div class="mixitem"><strong>${esc(type)}</strong><div class="track" aria-hidden="true"><div class="fill" style="width:${count/base.length*100}%"></div></div><span>${count}</span></div>`}).join('')}</div>
+    <div class="sectiontitle"><h2 id="inventory-detail-title">Apartment Detail</h2></div><div class="panel" data-inventory-detail tabindex="-1" aria-labelledby="inventory-detail-title">${selected?`<div class="detailgrid">${FIELDS.map(key=>`<div class="detailfield"><small>${esc(key.replaceAll('_',' '))}</small><strong>${esc(display(selected[key],key))}</strong></div>`).join('')}</div>`:'Choose “View” on any apartment above.'}</div></div>`;
     root.querySelectorAll('[data-filter]').forEach(el=>el.addEventListener(el.tagName==='INPUT'?'input':'change',()=>{state[el.dataset.filter]=el.value;state.page=0;selected=null;render()}));
     root.querySelectorAll('[data-sort]').forEach(el=>el.addEventListener('click',()=>{state.direction=state.sort===el.dataset.sort&&state.direction==='asc'?'desc':'asc';state.sort=el.dataset.sort;state.page=0;render()}));
-    root.querySelectorAll('[data-unit]').forEach(el=>el.addEventListener('click',()=>{selected=rows.find(r=>JSON.stringify([r.building,r.unit_id])===el.dataset.unit);render()}));
+    root.querySelectorAll('[data-unit]').forEach(el=>el.addEventListener('click',()=>{selected=rows.find(r=>JSON.stringify([r.building,r.unit_id])===el.dataset.unit);render();const detail=root.querySelector('[data-inventory-detail]');detail?.focus({preventScroll:true});detail?.scrollIntoView({behavior:'smooth',block:'nearest'})}));
     root.querySelector('[data-action="previous"]').onclick=()=>{state.page=Math.max(0,state.page-1);render()};
     root.querySelector('[data-action="next"]').onclick=()=>{state.page++;render()};
     root.querySelector('[data-action="reset"]').onclick=()=>{Object.assign(state,{building:'',status:'',layout:'',search:'',sort:'building',direction:'asc',page:0});selected=null;render()};
+    root.dataset.inventoryState='ready';
     if(focus){const input=root.querySelector(`[data-filter="${focus}"]`);input?.focus();if(input?.tagName==='INPUT'&&start!=null)input.setSelectionRange(start,start)}
   }
   async function refresh(){
     if(refreshing||stopped)return;refreshing=true;
     try{const next=await loadInventory(client);if(stopped)return;current=next;if(selected)selected=next.rows.find(r=>r.building===selected.building&&r.unit_id===selected.unit_id)||null;render()}
-    catch(error){if(!stopped){const notice=root.querySelector('[role="status"]');if(notice)notice.textContent=current?'Inventory refresh failed; showing the previous complete batch.':error.message}}
+    catch(error){if(!stopped){root.dataset.inventoryState=current?'ready':'error';const notice=root.querySelector('[role="status"]');if(notice)notice.textContent=current?'Inventory refresh failed; showing the previous complete batch.':'Master Inventory could not be loaded. Please try again.';if(!current){const retry=document.createElement('button');retry.type='button';retry.className='viewbtn';retry.textContent='Try again';retry.onclick=()=>{retry.remove();refresh()};root.appendChild(retry)}}}
     finally{refreshing=false}
   }
   await refresh();

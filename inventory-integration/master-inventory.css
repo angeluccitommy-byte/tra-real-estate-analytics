@@ -1,0 +1,28 @@
+/* Inventory-only layout; existing report styles and navigation remain unchanged. */
+#inventory { min-width: 0; }
+#inventory .invtools { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+#inventory .invtools .search { flex: 2 1 210px; min-width: 0; }
+#inventory .invtools select { flex: 1 1 130px; min-width: 0; }
+#inventory .invtools button, #inventory .invtools select, #inventory .invtools input { min-height: 44px; }
+#inventory .invtable { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+#inventory th button { font: inherit; color: inherit; background: transparent; border: 0; padding: 0; cursor: pointer; text-align: inherit; white-space: nowrap; }
+#inventory th[aria-sort="ascending"] button::after { content: " ↑"; }
+#inventory th[aria-sort="descending"] button::after { content: " ↓"; }
+#inventory .detailgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+#inventory .detailfield { min-width: 0; overflow-wrap: anywhere; }
+#inventory .detailfield strong { white-space: normal; }
+#inventory .invpager { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+#inventory .invpager button, #inventory .viewbtn { min-height: 44px; }
+#inventory [data-inventory-detail]:focus { outline: 2px solid #ac8947; outline-offset: 4px; }
+@media (max-width: 600px) {
+  #inventory .kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  #inventory .kpi { min-width: 0; }
+  #inventory .kpi strong { font-size: clamp(23px, 7vw, 34px); }
+  #inventory .invtools .search { flex-basis: 100%; }
+  #inventory .detailgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #inventory .panel { min-width: 0; padding: 14px; }
+  #inventory .headline { flex-wrap: wrap; }
+}
+@media (max-width: 360px) {
+  #inventory .detailgrid { grid-template-columns: minmax(0, 1fr); }
+}

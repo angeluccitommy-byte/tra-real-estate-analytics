@@ -35,7 +35,7 @@ async function refresh(){
  byType.forEach((x,i)=>bar(topBars[i],average(x.rows,'gross_rent'),maxGross,money(average(x.rows,'gross_rent'))));
  const pulse=root.querySelectorAll('.exec-grid > .exec-metric strong');
  // Portfolio rent-roll summary supplied by the owner; separate from signed-unit inventory calculations.
- const keys=['Financial Total Units','Financial Gross Monthly Rent','Financial Net Monthly Rent','Financial Annual Gross Rent','Financial Annual Net Rent'];
+ const keys=['Market Units','Financial Market Gross Monthly Rent','Financial Market Net Monthly Rent','Financial Market Annual Gross Rent','Financial Market Annual Net Rent'];
  const {data:financialMetrics,error:financialError}=await db.from('tra_metrics').select('metric,value,updated_at').in('metric',keys);
  if(financialError)throw financialError;
  const lookup=Object.fromEntries((financialMetrics||[]).map(r=>[r.metric,r]));
@@ -46,7 +46,7 @@ async function refresh(){
   [money(rentRoll.annualGross),money(rentRoll.annualNet),money(rentRoll.grossMonthly/rentRoll.units),money(rentRoll.netMonthly/rentRoll.units)].forEach((v,i)=>write(pulse[i],v));
  }
  const pulseCards=root.querySelectorAll('.exec-grid > .exec-metric');
- pulseCards.forEach((card,i)=>write(card.querySelector('small'),ready?(i<2?'OneDrive · Financial Analytics':'OneDrive monthly rent / total units'):'Workbook snapshot · awaiting OneDrive financial import'));
+ pulseCards.forEach((card,i)=>write(card.querySelector('small'),ready?(i<2?'OneDrive · Market rate only':'OneDrive market rent / 384 market units'):'Workbook snapshot · awaiting OneDrive financial import'));
  const cols=root.querySelector('.exec-columns');
  const revBars=cols?.querySelectorAll('.exec-card:first-child .exec-barline')||[];
  bar(revBars[0],gross,gross,compact(gross));bar(revBars[1],net,gross,compact(net));
@@ -63,7 +63,7 @@ async function refresh(){
  write(root.querySelector('.headline .eyebrow'),'TRA / Society Brooklyn / Financial Analytics');
  const liveStamp=financialStamp?financialStamp.toLocaleString('en-US',{timeZone:'America/New_York',dateStyle:'medium',timeStyle:'short'}):null;
  write(root.querySelector('.headline .chip'),liveStamp?'Financial synced '+liveStamp+' ET':'Inventory synced '+stamp+' ET');
- write(root.querySelector('.notice'),ready?'Top four financial cards: live OneDrive Financial Analytics · Financial synced '+liveStamp+' ET. Lower charts and tables: older inventory snapshot · Inventory synced '+stamp+' ET. These sources must not be compared as the same reporting period.':'Financial metrics pending. Lower charts and tables: inventory snapshot · '+stamp+' ET.');
+ write(root.querySelector('.notice'),ready?'Top four financial cards: live OneDrive MARKET RATE ONLY · Financial synced '+liveStamp+' ET. Lower charts and tables: older inventory snapshot · Inventory synced '+stamp+' ET. These sources must not be compared as the same reporting period.':'Financial metrics pending. Lower charts and tables: inventory snapshot · '+stamp+' ET.');
  write(chart?.querySelector('.tra-extra-card:first-child .sub'),'Older inventory snapshot · signed leases');
  write(root.querySelector('.exec-section span'),'Inventory snapshot · signed portfolio');
  const flag=root.querySelector('.exec-flag');

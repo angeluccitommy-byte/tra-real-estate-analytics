@@ -40,6 +40,7 @@ async function refresh(){
  if(financialError)throw financialError;
  const lookup=Object.fromEntries((financialMetrics||[]).map(r=>[r.metric,r]));
  const ready=keys.every(k=>lookup[k]&&Number.isFinite(Number(lookup[k].value))&&Number(lookup[k].value)>0);
+ const financialStamp=ready?new Date(Math.max(...keys.map(k=>Date.parse(lookup[k].updated_at)))):null;
  if(ready){
   const rentRoll={units:Number(lookup[keys[0]].value),grossMonthly:Number(lookup[keys[1]].value),netMonthly:Number(lookup[keys[2]].value),annualGross:Number(lookup[keys[3]].value),annualNet:Number(lookup[keys[4]].value)};
   [money(rentRoll.annualGross),money(rentRoll.annualNet),money(rentRoll.grossMonthly/rentRoll.units),money(rentRoll.netMonthly/rentRoll.units)].forEach((v,i)=>write(pulse[i],v));
@@ -59,13 +60,14 @@ async function refresh(){
  const last=[...positioning].slice(-4);
  byType.forEach((x,i)=>bar(last[i],average(x.rows,'gross_rent'),maxGross,money(average(x.rows,'gross_rent'))));
  const stamp=new Date(batch.synced_at).toLocaleString('en-US',{timeZone:'America/New_York',dateStyle:'medium',timeStyle:'short'});
- write(root.querySelector('.headline .eyebrow'),'TRA / Society Brooklyn / Active inventory');
- write(root.querySelector('.headline .chip'),'Synced '+stamp+' ET');
- write(root.querySelector('.notice'),'Executive Financial Pulse uses OneDrive financial metrics when available; otherwise it retains the labeled workbook snapshot. Other financial sections use the active validated inventory batch · Last synced '+stamp+' ET.');
- write(chart?.querySelector('.tra-extra-card:first-child .sub'),'Signed leases · annualized');
- write(root.querySelector('.exec-section span'),'Signed portfolio · annualized and monthly averages');
+ write(root.querySelector('.headline .eyebrow'),'TRA / Society Brooklyn / Financial Analytics');
+ const liveStamp=financialStamp?financialStamp.toLocaleString('en-US',{timeZone:'America/New_York',dateStyle:'medium',timeStyle:'short'}):null;
+ write(root.querySelector('.headline .chip'),liveStamp?'Financial synced '+liveStamp+' ET':'Inventory synced '+stamp+' ET');
+ write(root.querySelector('.notice'),ready?'Top four financial cards: live OneDrive Financial Analytics · Financial synced '+liveStamp+' ET. Lower charts and tables: older inventory snapshot · Inventory synced '+stamp+' ET. These sources must not be compared as the same reporting period.':'Financial metrics pending. Lower charts and tables: inventory snapshot · '+stamp+' ET.');
+ write(chart?.querySelector('.tra-extra-card:first-child .sub'),'Older inventory snapshot · signed leases');
+ write(root.querySelector('.exec-section span'),'Inventory snapshot · signed portfolio');
  const flag=root.querySelector('.exec-flag');
- if(flag)write(flag,'Source: active validated Supabase inventory. Revenue totals use signed leases only; market-rate tables cover all market inventory statuses. Per-square-foot figures are averages of available unit-level values.');
+ if(flag)write(flag,'Lower financial charts and tables currently use the older inventory batch ('+stamp+' ET), not the live OneDrive Financial Analytics totals. These sections are pending source conversion.');
 }
 async function start(){try{await refresh()}catch(e){console.warn('TRA Financial Analytics:',e);write(root?.querySelector('.headline .chip'),'Workbook snapshot · Live sync unavailable')}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();

@@ -35,10 +35,17 @@ async function refresh(){
  byType.forEach((x,i)=>bar(topBars[i],average(x.rows,'gross_rent'),maxGross,money(average(x.rows,'gross_rent'))));
  const pulse=root.querySelectorAll('.exec-grid > .exec-metric strong');
  // Portfolio rent-roll summary supplied by the owner; separate from signed-unit inventory calculations.
- const rentRoll={grossMonthly:2408077,netMonthly:2048291,annualGross:28896924,annualNet:24579492,units:517};
- [money(rentRoll.annualGross),money(rentRoll.annualNet),money(rentRoll.grossMonthly/rentRoll.units),money(rentRoll.netMonthly/rentRoll.units)].forEach((v,i)=>write(pulse[i],v));
+ const keys=['Financial Total Units','Financial Gross Monthly Rent','Financial Net Monthly Rent','Financial Annual Gross Rent','Financial Annual Net Rent'];
+ const {data:financialMetrics,error:financialError}=await db.from('tra_metrics').select('metric,value,updated_at').in('metric',keys);
+ if(financialError)throw financialError;
+ const lookup=Object.fromEntries((financialMetrics||[]).map(r=>[r.metric,r]));
+ const ready=keys.every(k=>lookup[k]&&Number.isFinite(Number(lookup[k].value))&&Number(lookup[k].value)>0);
+ if(ready){
+  const rentRoll={units:Number(lookup[keys[0]].value),grossMonthly:Number(lookup[keys[1]].value),netMonthly:Number(lookup[keys[2]].value),annualGross:Number(lookup[keys[3]].value),annualNet:Number(lookup[keys[4]].value)};
+  [money(rentRoll.annualGross),money(rentRoll.annualNet),money(rentRoll.grossMonthly/rentRoll.units),money(rentRoll.netMonthly/rentRoll.units)].forEach((v,i)=>write(pulse[i],v));
+ }
  const pulseCards=root.querySelectorAll('.exec-grid > .exec-metric');
- pulseCards.forEach((card,i)=>write(card.querySelector('small'),i<2?'Portfolio · rent roll summary':'Portfolio monthly total / 517 units'));
+ pulseCards.forEach((card,i)=>write(card.querySelector('small'),ready?(i<2?'OneDrive · Financial Analytics':'OneDrive monthly rent / total units'):'Workbook snapshot · awaiting OneDrive financial import'));
  const cols=root.querySelector('.exec-columns');
  const revBars=cols?.querySelectorAll('.exec-card:first-child .exec-barline')||[];
  bar(revBars[0],gross,gross,compact(gross));bar(revBars[1],net,gross,compact(net));
@@ -54,7 +61,7 @@ async function refresh(){
  const stamp=new Date(batch.synced_at).toLocaleString('en-US',{timeZone:'America/New_York',dateStyle:'medium',timeStyle:'short'});
  write(root.querySelector('.headline .eyebrow'),'TRA / Society Brooklyn / Active inventory');
  write(root.querySelector('.headline .chip'),'Synced '+stamp+' ET');
- write(root.querySelector('.notice'),'Executive Financial Pulse uses the supplied Rent Roll Summary (portfolio-wide workbook snapshot). Other financial sections use the active validated inventory batch · Last synced '+stamp+' ET.');
+ write(root.querySelector('.notice'),'Executive Financial Pulse uses OneDrive financial metrics when available; otherwise it retains the labeled workbook snapshot. Other financial sections use the active validated inventory batch · Last synced '+stamp+' ET.');
  write(chart?.querySelector('.tra-extra-card:first-child .sub'),'Signed leases · annualized');
  write(root.querySelector('.exec-section span'),'Signed portfolio · annualized and monthly averages');
  const flag=root.querySelector('.exec-flag');

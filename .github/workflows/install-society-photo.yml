@@ -1,0 +1,25 @@
+name: Install Society Brooklyn photo explorer
+on:
+  push:
+    paths:
+      - '.github/workflows/install-society-photo.yml'
+      - 'TRA_Society_Brooklyn_360_Photo_Explorer.zip'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract approved photographic explorer
+        run: unzip -o TRA_Society_Brooklyn_360_Photo_Explorer.zip society-brooklyn-360.html
+      - name: Publish page
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add society-brooklyn-360.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish Society Brooklyn photographic explorer"
+            git push
+          fi

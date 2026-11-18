@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-17",
+  "source": "Society_Brooklyn_Stacking_Plan_Fixed TA (7).xlsm, cached worksheet values; not live OneDrive",
+  "reports": {
+    "quarterly": {
+      "signedLeases": 21,
+      "newVisits": 117,
+      "octoberVisits": 74,
+      "novemberVisits": 43,
+      "months": [
+        {
+          "label": "Sep 2026",
+          "newVisits": null
+        },
+        {
+          "label": "Oct 2026",
+          "newVisits": 74
+        },
+        {
+          "label": "Nov 2026",
+          "newVisits": 43
+        }
+      ]
+    },
+    "sixMonth": {
+      "signedLeases": 43,
+      "newVisits": 117,
+      "octoberVisits": 74,
+      "novemberVisits": 43,
+      "months": [
+        {
+          "label": "Jun 2026",
+          "newVisits": null
+        },
+        {
+          "label": "Jul 2026",
+          "newVisits": null
+        },
+        {
+          "label": "Aug 2026",
+          "newVisits": null
+        },
+        {
+          "label": "Sep 2026",
+          "newVisits": null
+        },
+        {
+          "label": "Oct 2026",
+          "newVisits": 74
+        },
+        {
+          "label": "Nov 2026",
+          "newVisits": 43
+        }
+      ]
+    },
+    "twelveMonth": {
+      "signedLeases": 43,
+      "newVisits": 117,
+      "octoberVisits": 74,
+      "novemberVisits": 43,
+      "months": [
+        {
+          "label": "Dec 2025",
+          "newVisits": null
+        },
+        {
+          "label": "Jan 2026",
+          "newVisits": null
+        },
+        {
+          "label": "Feb 2026",
+          "newVisits": null
+        },
+        {
+          "label": "Mar 2026",
+          "newVisits": null
+        },
+        {
+          "label": "Apr 2026",
+          "newVisits": null
+        },
+        {
+          "label": "May 2026",
+          "newVisits": null
+        },
+        {
+          "label": "Jun 2026",
+          "newVisits": null
+        },
+        {
+          "label": "Jul 2026",
+          "newVisits": null
+        },
+        {
+          "label": "Aug 2026",
+          "newVisits": null
+        },
+        {
+          "label": "Sep 2026",
+          "newVisits": null
+        },
+        {
+          "label": "Oct 2026",
+          "newVisits": 74
+        },
+        {
+          "label": "Nov 2026",
+          "newVisits": 43
+        }
+      ]
+    }
+  }
+}

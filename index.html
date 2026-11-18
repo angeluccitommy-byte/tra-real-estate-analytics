@@ -399,7 +399,7 @@ async function loadTraReportingFeed(){
    const strong=view.querySelectorAll('.kpi strong');
    if(strong.length>=4){strong[0].textContent=data.signedLeases??'—';strong[1].textContent=data.newVisits??'—';strong[2].textContent=data.octoberVisits??'—';strong[3].textContent=data.novemberVisits??'—'}
    const panel=view.querySelector('.twocol .panel');
-   if(panel){const rows=data.months.map(m=>'<div class="tra-barline"><span>'+esc(m.label)+'</span><div class="tra-track"><div class="tra-fill" style="width:'+Math.max(0,Math.min(100,Number(m.newVisits||0)/Math.max(1,...data.months.map(x=>Number(x.newVisits||0)))*100))+'%"></div></div><b>'+esc(m.newVisits??'—')+'</b></div>').join('');panel.querySelectorAll('.tra-barline').forEach(el=>el.remove());panel.insertAdjacentHTML('beforeend',rows)}
+   if(panel){const rows=data.months.map(m=>'<div class="tra-barline"><span>'+esc(m.label)+'</span><div class="tra-track"><div class="tra-fill" style="width:'+Math.max(0,Math.min(100,Number(m.newVisits||0)/Math.max(1,...data.months.map(x=>Number(x.newVisits||0)))*100))+'%"></div></div><b>'+esc(m.newVisits??'N/A')+'</b></div>').join('');panel.querySelectorAll('.tra-barline').forEach(el=>el.remove());panel.insertAdjacentHTML('beforeend',rows)}
    const chip=view.querySelector('.chip');if(chip)chip.textContent='Workbook export · '+(feed.generatedAt||'date unavailable');
   }
  }catch(error){console.warn('TRA report export unavailable; showing labeled snapshot',error)}
